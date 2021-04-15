@@ -13,21 +13,30 @@ def main():
     #"LicenseImages/2.png"
     #"LicenseImages/3.png"
     #"LicenseImages/10.png"
+    #"LicenseImages/11.png"
+    #"LicenseImages/16.png"
+    #"LicenseImages/suzuki_car.jpeg"
 
     #TODO DOesn't work with: 
-    #"LicenseImages/mountain_car.jpeg" #Need to clear out clutter, remove background
-    #"LicenseImages/ny_car.jpeg"
-    #"LicenseImages/ontario_car2.jpeg" #Need to clear out clutter
     #"LicenseImages/1.png"
     #"LicenseImages/4.png" Need to fix find contors to find more boxes
     #"LicenseImages/5.png"
-    #"LicenseImages/6.png
+    #"LicenseImages/6.png"
     #"LicenseImages/8.png"
     #"LicenseImages/7.png" Only gets one character
     #"LicenseImages/9.png"
+    #"LicenseImages/11.png"
     #"LicenseImages/12.png"
+    #"LicenseImages/13.png"
+    #"LicenseImages/14.png"
+    #"LicenseImages/15.png"
     #"LicenseImages/delorean_car.jpeg"
-    imgOriginalScene  = cv2.imread("LicenseImages/delorean_car.jpeg")
+    #"LicenseImages/mountain_car.jpeg" #Need to clear out clutter, remove background
+    #"LicenseImages/ny_car.jpeg"
+    #"LicenseImages/ontario_car2.jpeg" #Need to clear out clutter
+    #"LicenseImages/philly_car.jpeg"
+    #"LicenseImages/texas_car.jpeg"
+    imgOriginalScene  = cv2.imread("LicenseImages/12.png")
 
     listOfPossiblePlates = [] 
 
@@ -52,18 +61,19 @@ def main():
 
     imgThreshScene = cv2.adaptiveThreshold(imgBlurred, 255.0, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV,19, 9)
 
-    cv2.namedWindow("imgOriginalScene", cv2.WINDOW_NORMAL)
     cv2.namedWindow("imgThreshScene", cv2.WINDOW_NORMAL)
-    cv2.imshow("imgOriginalScene", imgOriginalScene)
     cv2.imshow("imgThreshScene", imgThreshScene)
+    cv2.namedWindow("imgGrayscale", cv2.WINDOW_NORMAL)
+    cv2.imshow("imgGrayscale", imgGrayscale)
+    cv2.namedWindow("imgGrayscalePlusTopHat", cv2.WINDOW_NORMAL)
+    cv2.imshow("imgGrayscalePlusTopHat", imgGrayscalePlusTopHat)
 
     # TODO Edge Detection
     # TODO REMOVE CLUTTER FROM PICTURE
-    bfilter = cv2.bilateralFilter(imgThreshScene, 25,25,25) #11 17 17
+    bfilter = cv2.bilateralFilter(imgGrayscale, 25,25,25) #11 17 17
     imgEdged = cv2.Canny(bfilter, 30, 200)
     cv2.namedWindow("imgEdged", cv2.WINDOW_NORMAL)    
     cv2.imshow("imgEdged", imgEdged)
-    
     
 
     # TODO IMPROVE CONTOURS
@@ -87,7 +97,15 @@ def main():
         imgPlate = cv2.bitwise_and(imgOriginalScene ,imgOriginalScene, mask=mask)
         cv2.namedWindow(str(i), cv2.WINDOW_NORMAL)    
         cv2.imshow(str(i), imgPlate)
-        i = i + 1
+        break
+        
+    if listOfPossiblePlates:
+        (x,y) = np.where(mask==255)
+        (x1, y1) = (np.min(x), np.min(y))
+        (x2, y2) = (np.max(x), np.max(y))
+        license = imgGrayscale[x1:x2+1, y2:y2+1]
+    
+    
     
     # TODO OCR.
     cv2.waitKey(0)
