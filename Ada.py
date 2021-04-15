@@ -10,12 +10,18 @@ import glob
 ALPHA_DICT = {0: '0', 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8', 9: '9', 10: 'A', 11: 'B', 12: 'E',
               13: 'H', 14: 'I', 15: 'K', 16: 'L', 17: 'M', 18: 'N', 19: 'O', 20: 'P', 21: 'T', 22: 'U', 23: 'X', 24: 'Y',
               25: 'Z', 26: 'Background'}
-folders = glob.glob("C:\\Users\\khale\\Desktop\\cars\\ocr\\ocr\\train_data\\*")
+
+folders = glob.glob("/home/godrowr/PycharmProjects/OpenCV_RecognizingCars/train_data") #TODO CHange absolute paths to relative
 images = []
 labels = []
 index = 0
 for folder in folders:
-    for f in glob.glob(folder+'/*.png'):
+    for f in folder:
+        index = index + 1
+print(index)
+index = 0
+for folder in folders:
+    for f in glob.glob(folder+'/*.png'): #folder+'/*.png'
         image = cv2.imread(f,cv2.IMREAD_GRAYSCALE)
         tempimage = cv2.resize(image, (28, 28))
         images.append(tempimage.reshape(-1))
@@ -23,7 +29,7 @@ for folder in folders:
     index = index + 1 
 images = np.array(images)
 labels = np.array(labels)
-
+print("Images for training {}".format(images.size))
 #Split arrays/matrices into random train and test subsets
 train_images, test_images, train_labels, test_labels = train_test_split(images, labels, train_size=0.8,random_state=1)
 

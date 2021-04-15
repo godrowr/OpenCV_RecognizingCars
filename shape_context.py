@@ -1,4 +1,5 @@
-import math, cv2
+import math
+import cv2
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 import tps
@@ -314,7 +315,9 @@ import cv2
 import numpy as np
 import glob
 
-path = "C:\\Users\\khale\\Desktop\\cars\\ocr\\ocr\\train_data\\*"
+
+
+path = "/home/godrowr/PycharmProjects/OpenCV_RecognizingCars/train_data/*"
 images = []
 labels = []
 # index = 0
@@ -322,16 +325,19 @@ folders = glob.glob(path)
 # prepare target data
 targetimages = []
 targetlabels = []
+#types = ['/*.jpg', '/*.jpeg', '/*.png']
+#pic = cv2.imread("train_data/usa-fl_bfjq50_close.jpg",cv2.IMREAD_GRAYSCALE)
+
 for folder in folders:
     index  = folder[-1]
     for f in glob.glob(folder+'/*.png'):
+        print(f)
         image = cv2.imread(f,cv2.IMREAD_GRAYSCALE)
         tempimage = cv2.resize(image, (28, 28))
         targetimages.append(tempimage)
         targetlabels.append(index)
         break
-    # index = index + 1 
-
+    # index = index + 1
 #  read whole images
 for folder in folders:
     index  = folder[-1]
@@ -341,8 +347,13 @@ for folder in folders:
         images.append(tempimage)
         labels.append(index)
 
+print("Images size are:", len(images))
 
 testimage = images[0]
+cv2.namedWindow("output", cv2.WINDOW_NORMAL)
+cv2.imshow("output",testimage)
+cv2.resizeWindow('output', 400,400)
+
 
 mini = 100000000
 candidate_image = 0
@@ -354,3 +365,6 @@ for i in range(len(targetimages)) :
         candidate_image = i
 print("exact value :{}".format(labels[0]))
 print("predict  {}".format(targetlabels[candidate_image]))
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
