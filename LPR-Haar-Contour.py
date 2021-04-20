@@ -5,14 +5,13 @@ from matplotlib import pyplot as plt
 import imutils
 import time
 
+# 12.png sort of
 plate_cascade = cv2.CascadeClassifier("cascade.xml")
 
 russian_plate_number_cascade = cv2.CascadeClassifier("haarcascade_russian_plate_number.xml")
 
-licence_plate_rus_cascade = cv2.CascadeClassifier("haarcascade_licence_plate_rus_16stages.xml")
-
-path = "LicenseImages/1"
-algo = ".png"
+path = "LicenseImages/suzuki_car"
+algo = ".jpeg"
 videopath = 'testdriverussia.mp4'
 imgOriginal  = cv2.imread(path + algo) #suzuki_car.jpeg  10.png
 
@@ -35,6 +34,7 @@ def clean_license(plate_number, img, method):
 		plate = cv2.erode(plate,k, iterations=1)
 		plate = cv2.cvtColor(plate,cv2.COLOR_BGR2GRAY)
 		cv2.imshow('plate', plate)
+		#cv2.imwrite(path + "_plate" + algo, plate)
 
 #def haar_track_plate(start_plate_number, end_plate_number, start_frame, end_frame):
 	
@@ -42,8 +42,9 @@ def clean_license(plate_number, img, method):
 def haar_video_detect(cascade):
 	cap = cv2.VideoCapture(videopath)
 	count = 0
-	start_plate_number = []
-	end_plate_number = []
+	x_min = 0
+	y_min = 0
+	detected = 0
 	while(cap.isOpened()):
 		ret, frame = cap.read()
 
@@ -52,16 +53,21 @@ def haar_video_detect(cascade):
 		print(plate_number)
 		for (x, y, w, h) in plate_number:
 			cv2.rectangle(frame, (x,y), (x+w, y+h), (255,0,0), 2)
+			if count == 1:
+				detected = 1
+				x_min = x
+				y_min = y
 			count = count + 1
-		if count == 1:
-			start_frame = frame
-			start_plate_number = plate_number	
 		cv2.imshow('frame',frame)
-		end_frame = frame
-		end_plate_number = plate_number
-		if cv2.waitKey(1) & 0xFF == ord('q'):
-			
-			return start_plate_number, start_frame
+		
+		if detected == 1 and not any(map(len, plate_number)) or cv2.waitKey(1) & 0xFF == ord('q'):
+			cv2.rectangle(frame, (x_min, y_min), (x_min+w, y_min+h), (255,0,0), 2)
+			cv2.line(frame, (x_min, y_min), (x+w, y+h), (0, 0, 255), 2)
+			cv2.rectangle(frame, (x,y), (x+w, y+h), (255,0,0), 2)
+			cv2.imshow('frame',frame)
+			#clean_license(plate_number, frame, "video")
+			return plate_number,frame
+	
 
 def haar_image_detect(imgGray, cascade):
 	plate_number = cascade.detectMultiScale(imgGray, 1.3, 5)
@@ -103,7 +109,31 @@ def convert_to_xywh(plate_number):
 	h = max_y - min_y 
 	return [min_x, min_y, w, h]
 
-
+# 	
+def hough_image_detect(imgGray):
+	bfilter = cv2.bilateralFilter(imgGray, 25,25,25) #11 17 17
+	imgEdged = cv2.Canny(bfilter, 30, 200)	
+	lines = cv2.HoughLines(imgEdged,1,np.pi/180,200)
+	for line in lines:
+	    rho,theta = line[0]
+	    a = np.cos(theta)
+	    b = np.sin(theta)
+	    x0 = a*rho
+	    y0 = b*rho
+	    x1 = int(x0 + 1000*(-b))
+	    y1 = int(y0 + 1000*(a))
+	    x2 = int(x0 - 1000*(-b))
+	    y2 = int(y0 - 1000*(a))
+	    cv2.line(img,(x1,y1),(x2,y2),(0,0,255),2)
+	
+	lines = cv2.HoughLinesP(imgEdged,1,np.pi/180,100,minLineLength=20,maxLineGap=20)
+	for line in lines:
+    		x1,y1,x2,y2 = line[0]
+    		if x2 - x1 > 50 and y2 - y1 < 1:
+    			cv2.line(img,(x1,y1),(x2,y2),(0,255,0),2)
+	    
+	cv2.imshow("imgEdged-hough", img)	
+	
 	
 	
 def contour_image_detect(imgGray):
@@ -111,8 +141,10 @@ def contour_image_detect(imgGray):
 
 	bfilter = cv2.bilateralFilter(imgGray, 25,25,25) #11 17 17
 	imgEdged = cv2.Canny(bfilter, 30, 200)	
+
 	cv2.imshow("imgEdged", imgEdged)
 
+	
 	keypoints = cv2.findContours(imgEdged, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) 
 	contours = imutils.grab_contours(keypoints)
 	possible_plate_contours = sorted(contours, key=cv2.contourArea,reverse=True)
@@ -120,29 +152,33 @@ def contour_image_detect(imgGray):
 	location = None
 	for contour in possible_plate_contours:
 		perimeter = cv2.arcLength(contour, True)
-		approx = cv2.approxPolyDP(contour, 5, True)
+		approx = cv2.approxPolyDP(contour, 5, True)[:10]
 		if len(approx) == 4:
 			location = approx
 			plate_number.append(location)
 			break
 			
-	mask = np.zeros(imgGray.shape, np.uint8)	
+	mask = np.zeros(imgGray.shape, np.uint8)
+	new_plate_number = []	
+	for p in plate_number:
+		plate = convert_to_xywh(p)
+		print(plate)
+		if plate[2] > 20 and plate[3] > 20:
+			new_plate_number = []
+			new_plate_number.append(plate)
+			clean_license(new_plate_number, img, "contour")
+	#print(new_plate_number)
+	#clean_license(new_plate_number, img, "contour")
 	
-		
-	plate = convert_to_xywh(plate_number[0])
-	plate_number = [] 
-	plate_number.append(plate)
-	clean_license(plate_number, img, "contour")
-	cv2.imshow('img', img)
+	#clean_license(plate_number, img, "contour")
+	#cv2.imshow('img', img)
 	
 def main():
 	imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-	haar_image_detect(imgGray,plate_cascade)
-	#start, end = video_detect(russian_plate_number_cascade)
-	#print("----")
-	#print(start)
-	#print(end)
+	haar_image_detect(imgGray,russian_plate_number_cascade)
+	#plate, frame  = haar_video_detect(russian_plate_number_cascade)
 	#contour_image_detect(imgGray)
+	#hough_image_detect(imgGray)
 	
 	cv2.waitKey(0)
 	cv2.destroyAllWindows()
