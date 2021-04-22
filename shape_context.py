@@ -317,7 +317,7 @@ import glob
 
 
 
-path = "/home/godrowr/PycharmProjects/OpenCV_RecognizingCars/train_data/*"
+path = "/train_data/*"
 images = []
 labels = []
 # index = 0
