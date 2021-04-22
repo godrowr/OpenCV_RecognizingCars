@@ -48,7 +48,7 @@ python LPR-Haar-Contour.py
 
 
 
-###References:
+### References:
 Special thanks to all these people!
 
 Louka Dlagnekov (2005). Video-based Car Surveillance: License Plate, Make, and Model Recognition. University of California. Available at: http://vision.ucsd.edu/belongie-grp/research/carRec/dlagnekov_thesis_2005.pdf 
