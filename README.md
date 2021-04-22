@@ -44,8 +44,29 @@ Then run the LPR code.
 ```
 python LPR-Haar-Contour.py
 ```
+### OCR Instructions
 
+python segmentation.py “your image file name” to segment your image into single character. 
 
+'''
+An example would be passing the program 'example.png' 
+images. The result images would write to the “Output” folder.
+'''
+
+To run shape context algorithm for segmented characters:
+python shape_context.py to perform shape context recognition once you have segemented characters running the segmentation.py above.
+
+'''
+It will reads all character images
+and display the prediction
+'''
+
+To run shape context algorithm for testing with training data:
+python SHAPE.py 
+
+'''
+Pass in a index between 0-653 on line 353 and line 378 for the label to print the exact value and predicted value.
+'''
 
 
 ### References:
