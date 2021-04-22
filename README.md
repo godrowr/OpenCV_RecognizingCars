@@ -46,7 +46,7 @@ python LPR-Haar-Contour.py
 ```
 ### OCR Instructions
 
-python segmentation.py “your image file name” to segment your image into single character. 
+python segmentation.py or seg.py “your image file name” to segment your image into single character. 
 
 '''
 An example would be passing the program 'example.png' from the licensePlates folder
