@@ -6,7 +6,7 @@ Using Machine Vision to recognize license plates, make and model on a car for CO
 Ensure you have the dependencies installed!
 
 ```
-pip install opencv-python, numpy, matplotlib, imutils, 
+pip install opencv-python numpy matplotlib imutils 
 git clone https://github.com/godrowr/OpenCV_RecognizingCars
 cd OpenCV_RecognizingCars
 gedit LPR-Haar-Contour.py
