@@ -49,7 +49,7 @@ python LPR-Haar-Contour.py
 python segmentation.py or seg.py “your image file name” to segment your image into single character. 
 
 '''
-An example would be passing the program 'example.png' from the licensePlates folder
+An example would be passing the program 'example.png' or 'example2.png' incase other license plates don't segment correctly  *from the licensePlates folder*
 images. The result images would write to the “Output” folder.
 '''
 
