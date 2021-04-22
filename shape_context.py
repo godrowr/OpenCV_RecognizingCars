@@ -1,8 +1,8 @@
-import math
-import cv2
+import math, cv2
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 import tps
+import os
 
 class Point:
     def __init__(self, x, y):
@@ -315,29 +315,48 @@ import cv2
 import numpy as np
 import glob
 
+def display():
+    cv2.namedWindow("output", cv2.WINDOW_NORMAL)
+    cv2.imshow("output",testimage)
+    cv2.resizeWindow('output', 700,700)
 
+current_directory = os.getcwd()
+path = os.path.join(current_directory, 'train_data', '*')
+# Segmented characters folder
+outputPath = os.path.join(current_directory, 'Output', '*')
 
-path = "/train_data/*"
 images = []
+outputImages = []
+outputLabels = []
 labels = []
 # index = 0
 folders = glob.glob(path)
+outputFolder = glob.glob(outputPath)
 # prepare target data
 targetimages = []
 targetlabels = []
-#types = ['/*.jpg', '/*.jpeg', '/*.png']
-#pic = cv2.imread("train_data/usa-fl_bfjq50_close.jpg",cv2.IMREAD_GRAYSCALE)
-
 for folder in folders:
     index  = folder[-1]
+
     for f in glob.glob(folder+'/*.png'):
-        print(f)
         image = cv2.imread(f,cv2.IMREAD_GRAYSCALE)
-        tempimage = cv2.resize(image, (28, 28))
+        tempimage = cv2.resize(image, (40, 40))
         targetimages.append(tempimage)
         targetlabels.append(index)
         break
-    # index = index + 1
+    # index = index + 1 
+
+#read output images from segmentation.py
+for output in outputFolder:
+    index  = folder[-1]
+    if(os.path.basename(folder) != "Rows"):
+        for o in glob.glob(output+'/*.png'):
+            image = cv2.imread(o,cv2.IMREAD_GRAYSCALE)
+            tempimage = cv2.resize(image, (28, 28))
+            outputImages.append(tempimage)
+            outputLabels.append(index)
+
+
 #  read whole images
 for folder in folders:
     index  = folder[-1]
@@ -347,24 +366,28 @@ for folder in folders:
         images.append(tempimage)
         labels.append(index)
 
-print("Images size are:", len(images))
 
-testimage = images[0]
-cv2.namedWindow("output", cv2.WINDOW_NORMAL)
-cv2.imshow("output",testimage)
-cv2.resizeWindow('output', 400,400)
 
+print(len(outputImages))
 
 mini = 100000000
 candidate_image = 0
-for i in range(len(targetimages)) :
-    print("calculate distance with  {}".format(targetlabels[i]))
-    dist = distance(testimage, targetimages[i])
-    if mini > dist:
-        mini = dist
-        candidate_image = i
-print("exact value :{}".format(labels[0]))
-print("predict  {}".format(targetlabels[candidate_image]))
+#First letter should be an 'H' when segmenting the plate 'example.png', however it does not predict this..
+#it continues looping until it reaches the end. We stop at the first in this case to not take up too much time.
+for i in range(len(targetimages)):
+    testimage = outputImages[i]
+    for i in range(len(targetlabels)):  
+        display()
+        print("calculate distance with  {}".format(targetlabels[i]))
+        dist = distance(testimage, targetimages[i])
+        if mini > dist:
+            mini = dist
+            candidate_image = i
+    
+    #print("exact value :{}".format(labels[586]))
+    print("predict  {}".format(targetlabels[candidate_image]))
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+
+
