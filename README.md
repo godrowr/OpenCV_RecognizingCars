@@ -14,7 +14,7 @@ gedit LPR-Haar-Contour.py
 
 Change the path to the file you wish to preform license plate recognition. 
 
-- Contours work with everythin except 12.png. 
+- Contours work with all images in LicenseImages except 12.png. 
 ```
 path = "LicenseImages/1"
 algo = ".png"
