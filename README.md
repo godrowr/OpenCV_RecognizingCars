@@ -1,7 +1,7 @@
 # OpenCV_RecognizingCars
 Using Machine Vision to recognize license plates, make and model on a car for COMP4102 project. 
 
-## Instructions
+### LPR Instructions
 
 Ensure you have the dependencies installed!
 
@@ -41,12 +41,14 @@ Then uncomment out the line of the method you wish to run.
 
 Then run the LPR code. 
 
-'''
+```
 python LPR-Haar-Contour.py
-'''
+```
 
 
-References:
+
+
+###References:
 Special thanks to all these people!
 
 Louka Dlagnekov (2005). Video-based Car Surveillance: License Plate, Make, and Model Recognition. University of California. Available at: http://vision.ucsd.edu/belongie-grp/research/carRec/dlagnekov_thesis_2005.pdf 
